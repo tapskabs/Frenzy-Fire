@@ -2304,8 +2304,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerPrefab: {fileID: 3239289196144803158, guid: 83569ceb00f72f1438cc7110e922de54,
     type: 3}
-  enemyPrefab: {fileID: 2872034556900588932, guid: 22b83823b6af0b44f993eea5c8fa45c7,
-    type: 3}
+  enemyPrefabs:
+  - {fileID: 2872034556900588932, guid: 22b83823b6af0b44f993eea5c8fa45c7, type: 3}
+  - {fileID: 2198405027808738111, guid: ca2455b626c788444ae14228e0851757, type: 3}
+  - {fileID: 3479591488518300039, guid: d677c087fff5eaa4685a4da7773911f7, type: 3}
+  - {fileID: 5357327612255982492, guid: a25fa0d28d4d49c40b4dda537f69ebdc, type: 3}
+  - {fileID: 4154536557198838521, guid: 03494d27de6e84e42b446116d329960d, type: 3}
   playerBattleStation: {fileID: 776899475}
   enemyBattleStation: {fileID: 1466009198}
   dialogueText: {fileID: 1584004651}
