@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 6b4e32d168ef1344b885780d09deb563
+timeCreated: 1498584647
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 7400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 94188
+  packageName: Fire Bounce 2D animation pack
+  packageVersion: 1.0
+  assetPath: Assets/MainAsset/Animation/FireBounce/3/Stay.anim
+  uploadId: 187145

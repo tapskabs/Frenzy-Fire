@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 5940fa795010ca94aa2e674c5d331fb8
+timeCreated: 1498584647
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 9100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 94188
+  packageName: Fire Bounce 2D animation pack
+  packageVersion: 1.0
+  assetPath: Assets/MainAsset/Animation/FireBounce/3/3.controller
+  uploadId: 187145
