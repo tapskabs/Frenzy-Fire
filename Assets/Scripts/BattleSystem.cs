@@ -31,6 +31,11 @@ public class BattleSystem : MonoBehaviour
     // The name of the next scene to load after the game ends
     public string nextSceneName;
 
+    // Cooldown tracker for the special ability
+    private int specialCooldown = 0;
+    private const int specialCooldownDuration = 3;
+    private int currentTurn = 0;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -102,6 +107,29 @@ public class BattleSystem : MonoBehaviour
         }
     }
 
+    IEnumerator PlayerSpecialAbility()
+    {
+        bool isDead = enemyUnit.TakeDamage(playerUnit.damage * 2); // Special ability deals double damage
+
+        enemyHUD.SetHP(enemyUnit.currentHP);
+        dialogueText.text = "Special ability attack is successful!";
+
+        specialCooldown = specialCooldownDuration; // Reset cooldown
+
+        yield return new WaitForSeconds(2f);
+
+        if (isDead)
+        {
+            state = BattleState.WON;
+            EndBattle();
+        }
+        else
+        {
+            state = BattleState.ENEMYTURN;
+            StartCoroutine(EnemyTurn());
+        }
+    }
+
     IEnumerator EnemyTurn()
     {
         dialogueText.text = enemyUnit.unitName + " attacks!";
@@ -138,7 +166,7 @@ public class BattleSystem : MonoBehaviour
                 Invoke("LoadNextScene", 2f);
                 return;
             }
-            //playerUnit.LevelUp(5); // Increase player level by 5
+           // playerUnit.LevelUp(5); // Increase player level by 5
             dialogueText.text += " You leveled up!";
             playerHUD.SetHUD(playerUnit); // Update player HUD to reflect new stats
             SpawnNextEnemy();
@@ -156,6 +184,11 @@ public class BattleSystem : MonoBehaviour
     void PlayerTurn()
     {
         dialogueText.text = "Choose an action:";
+        currentTurn++;
+        if (specialCooldown > 0)
+        {
+            specialCooldown--;
+        }
     }
 
     IEnumerator PlayerHeal()
@@ -185,6 +218,20 @@ public class BattleSystem : MonoBehaviour
             return;
 
         StartCoroutine(PlayerHeal());
+    }
+
+    public void OnSpecialAbilityButton()
+    {
+        if (state != BattleState.PLAYERTURN)
+            return;
+
+        if (specialCooldown > 0)
+        {
+            dialogueText.text = $"Special ability is on cooldown. {specialCooldown} turn(s) remaining.";
+            return;
+        }
+
+        StartCoroutine(PlayerSpecialAbility());
     }
 
     void LoadNextScene()
