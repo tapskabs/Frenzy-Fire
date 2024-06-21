@@ -471,11 +471,11 @@ RectTransform:
   - {fileID: 2042324407}
   - {fileID: 1250042420}
   - {fileID: 1360089134}
-  - {fileID: 397568563}
-  - {fileID: 651185131}
   - {fileID: 1119393436}
   - {fileID: 588551011}
   - {fileID: 1754886242}
+  - {fileID: 397568563}
+  - {fileID: 651185131}
   m_Father: {fileID: 519420032}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}

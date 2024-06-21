@@ -139,5 +139,5 @@ MonoBehaviour:
   unitName: Fire Fledgling
   unitLevel: 10
   damage: 10
-  maxHP: 10
-  currentHP: 10
+  maxHP: 20
+  currentHP: 20
