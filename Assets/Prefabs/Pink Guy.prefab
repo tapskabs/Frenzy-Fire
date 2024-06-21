@@ -102,5 +102,5 @@ MonoBehaviour:
   unitName: Pink Guy
   unitLevel: 10
   damage: 5
-  maxHP: 45
-  currentHP: 45
+  maxHP: 35
+  currentHP: 35

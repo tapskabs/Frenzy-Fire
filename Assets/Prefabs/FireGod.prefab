@@ -125,5 +125,5 @@ MonoBehaviour:
   unitName: Fire God
   unitLevel: 100
   damage: 20
-  maxHP: 20
-  currentHP: 20
+  maxHP: 50
+  currentHP: 50
