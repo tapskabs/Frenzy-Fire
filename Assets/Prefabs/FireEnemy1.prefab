@@ -138,6 +138,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   unitName: Fire Enemy
   unitLevel: 7
-  damage: 1
+  damage: 5
   maxHP: 10
-  currentHP: 2
+  currentHP: 10

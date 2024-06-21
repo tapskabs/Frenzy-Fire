@@ -138,6 +138,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   unitName: Fire Fledgling
   unitLevel: 10
-  damage: 5
+  damage: 10
   maxHP: 10
   currentHP: 10

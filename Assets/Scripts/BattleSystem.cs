@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.SceneManagement; // Import the SceneManagement namespace
+using UnityEngine.SceneManagement; 
 
 public enum BattleState { START, PLAYERTURN, ENEMYTURN, WON, LOST }
 
@@ -10,7 +10,7 @@ public class BattleSystem : MonoBehaviour
 {
     public GameObject playerPrefab;
 
-    // Array to hold different enemy prefabs
+   
     public GameObject[] enemyPrefabs;
 
     public Transform playerBattleStation;
@@ -28,15 +28,15 @@ public class BattleSystem : MonoBehaviour
 
     private int currentEnemyIndex = 0;
 
-    // The name of the next scene to load after the game ends
+    
     public string nextSceneName;
 
-    // Cooldown tracker for the special ability
+    
     private int specialCooldown = 0;
     private const int specialCooldownDuration = 3;
     private int currentTurn = 0;
 
-    // Start is called before the first frame update
+    
     void Start()
     {
         state = BattleState.START;
@@ -45,8 +45,12 @@ public class BattleSystem : MonoBehaviour
 
     IEnumerator SetupBattle()
     {
-        GameObject playerGO = Instantiate(playerPrefab, playerBattleStation);
-        playerUnit = playerGO.GetComponent<Unit>();
+        
+        if (playerUnit == null)
+        {
+            GameObject playerGO = Instantiate(playerPrefab, playerBattleStation);
+            playerUnit = playerGO.GetComponent<Unit>();
+        }
 
         SpawnNextEnemy();
 
@@ -69,7 +73,7 @@ public class BattleSystem : MonoBehaviour
             return;
         }
 
-        // Clear the previous enemy if it exists
+        
         if (enemyBattleStation.childCount > 0)
         {
             foreach (Transform child in enemyBattleStation)
@@ -78,7 +82,7 @@ public class BattleSystem : MonoBehaviour
             }
         }
 
-        // Instantiate the next enemy prefab
+        
         GameObject enemyGO = Instantiate(enemyPrefabs[currentEnemyIndex], enemyBattleStation);
         enemyUnit = enemyGO.GetComponent<Unit>();
 
@@ -109,12 +113,12 @@ public class BattleSystem : MonoBehaviour
 
     IEnumerator PlayerSpecialAbility()
     {
-        bool isDead = enemyUnit.TakeDamage(playerUnit.damage * 2); // Special ability deals double damage
+        bool isDead = enemyUnit.TakeDamage(playerUnit.damage * 2); 
 
         enemyHUD.SetHP(enemyUnit.currentHP);
         dialogueText.text = "Special ability attack is successful!";
 
-        specialCooldown = specialCooldownDuration; // Reset cooldown
+        specialCooldown = specialCooldownDuration; 
 
         yield return new WaitForSeconds(2f);
 
@@ -162,13 +166,12 @@ public class BattleSystem : MonoBehaviour
             if (currentEnemyIndex >= enemyPrefabs.Length)
             {
                 dialogueText.text = "You defeated all enemies!";
-                // Load the next scene after a delay to show the message
+                
                 Invoke("LoadNextScene", 2f);
                 return;
-            }
-           // playerUnit.LevelUp(5); // Increase player level by 5
+            } 
             dialogueText.text += " You leveled up!";
-            playerHUD.SetHUD(playerUnit); // Update player HUD to reflect new stats
+            playerHUD.SetHUD(playerUnit); 
             SpawnNextEnemy();
             state = BattleState.START;
             StartCoroutine(SetupBattle());
@@ -176,7 +179,6 @@ public class BattleSystem : MonoBehaviour
         else if (state == BattleState.LOST)
         {
             dialogueText.text = "You were defeated.";
-            // Load the next scene after a delay to show the message
             Invoke("LoadNextScene", 2f);
         }
     }

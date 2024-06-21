@@ -138,6 +138,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   unitName: Fire Knight
   unitLevel: 20
-  damage: 5
-  maxHP: 10
-  currentHP: 10
+  damage: 15
+  maxHP: 20
+  currentHP: 20

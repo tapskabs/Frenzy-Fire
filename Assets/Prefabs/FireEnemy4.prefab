@@ -124,6 +124,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   unitName: Fire Frenzy
   unitLevel: 50
-  damage: 5
-  maxHP: 20
-  currentHP: 20
+  damage: 15
+  maxHP: 30
+  currentHP: 30
