@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement; // Import the SceneManagement namespace
 
 public enum BattleState { START, PLAYERTURN, ENEMYTURN, WON, LOST }
 
@@ -26,6 +27,9 @@ public class BattleSystem : MonoBehaviour
     public BattleState state;
 
     private int currentEnemyIndex = 0;
+
+    // The name of the next scene to load after the game ends
+    public string nextSceneName;
 
     // Start is called before the first frame update
     void Start()
@@ -130,11 +134,13 @@ public class BattleSystem : MonoBehaviour
             if (currentEnemyIndex >= enemyPrefabs.Length)
             {
                 dialogueText.text = "You defeated all enemies!";
+                // Load the next scene after a delay to show the message
+                Invoke("LoadNextScene", 2f);
                 return;
             }
-            playerUnit.LevelUp();
+            //playerUnit.LevelUp(5); // Increase player level by 5
             dialogueText.text += " You leveled up!";
-            playerHUD.SetHUD(playerUnit);
+            playerHUD.SetHUD(playerUnit); // Update player HUD to reflect new stats
             SpawnNextEnemy();
             state = BattleState.START;
             StartCoroutine(SetupBattle());
@@ -142,6 +148,8 @@ public class BattleSystem : MonoBehaviour
         else if (state == BattleState.LOST)
         {
             dialogueText.text = "You were defeated.";
+            // Load the next scene after a delay to show the message
+            Invoke("LoadNextScene", 2f);
         }
     }
 
@@ -177,5 +185,10 @@ public class BattleSystem : MonoBehaviour
             return;
 
         StartCoroutine(PlayerHeal());
+    }
+
+    void LoadNextScene()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
     }
 }
