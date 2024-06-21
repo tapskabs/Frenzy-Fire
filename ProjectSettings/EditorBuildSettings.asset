@@ -17,11 +17,5 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/HelpScreen.unity
     guid: 96f8dc6c8e6bced41a2e38aed0a96690
-  - enabled: 0
-    path: Assets/Scenes/Instructions.unity
-    guid: 1b81801e76e66af48acc326e236ec70b
-  - enabled: 0
-    path: Assets/Scenes/HomeScreen.unity
-    guid: 37f2656bb5dbf054ca0685eaed31235f
   m_configObjects: {}
   m_UseUCBPForAssetBundles: 0
