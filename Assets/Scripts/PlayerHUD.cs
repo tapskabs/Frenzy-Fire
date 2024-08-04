@@ -1,9 +1,9 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class BattleHUD : MonoBehaviour
+public class PlayerHUD : MonoBehaviour
 {
     public Text nameText;
     public Text levelText;
@@ -22,4 +22,3 @@ public class BattleHUD : MonoBehaviour
         hpSlider.value = hp;
     }
 }
-
