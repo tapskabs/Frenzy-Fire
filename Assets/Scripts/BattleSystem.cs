@@ -28,6 +28,7 @@ public class BattleSystem : MonoBehaviour
 
     private int currentEnemyIndex;
     private int specialCooldown = 0; // Special ability cooldown
+    private int turnsSinceSpecial = 0; // Turns since special was last used
 
     // The name of the next scene to load after the game ends
     public string nextSceneName;
@@ -110,6 +111,8 @@ public class BattleSystem : MonoBehaviour
             state = BattleState.ENEMYTURN;
             StartCoroutine(EnemyTurn());
         }
+
+        turnsSinceSpecial++; // Increment turn counter for special cooldown
     }
 
     IEnumerator EnemyTurn()
@@ -134,6 +137,8 @@ public class BattleSystem : MonoBehaviour
             state = BattleState.PLAYERTURN;
             PlayerTurn();
         }
+
+        turnsSinceSpecial++; // Increment turn counter for special cooldown
     }
 
     void EndBattle()
@@ -192,6 +197,7 @@ public class BattleSystem : MonoBehaviour
     IEnumerator PlayerSpecial()
     {
         specialCooldown = 3; // Set cooldown for special attack
+        turnsSinceSpecial = 0; // Reset turn counter for special attack
         playerUnit.damage += 10; // Increase player damage by 10 for the special attack
         dialogueText.text = "Special attack used! Damage increased.";
 
@@ -222,9 +228,9 @@ public class BattleSystem : MonoBehaviour
         if (state != BattleState.PLAYERTURN)
             return;
 
-        if (specialCooldown > 0)
+        if (turnsSinceSpecial < 3)
         {
-            dialogueText.text = "Special attack on cooldown. Wait " + specialCooldown + " turns.";
+            dialogueText.text = "Special attack on cooldown. Wait " + (3 - turnsSinceSpecial) + " more turns.";
             return;
         }
 
@@ -234,13 +240,5 @@ public class BattleSystem : MonoBehaviour
     void LoadNextScene()
     {
         SceneManager.LoadScene("TopDownScene");
-    }
-
-    void Update()
-    {
-        if (specialCooldown > 0)
-        {
-            specialCooldown--;
-        }
     }
 }
