@@ -26,7 +26,7 @@ public class BattleSystem : MonoBehaviour
 
     public BattleState state;
 
-    private int currentEnemyIndex = 0;
+    private int currentEnemyIndex;
     private int specialCooldown = 0; // Special ability cooldown
 
     // The name of the next scene to load after the game ends
@@ -49,6 +49,9 @@ public class BattleSystem : MonoBehaviour
         playerUnit.damage = PlayerPrefs.GetInt("PlayerDamage", 10);
         playerUnit.maxHP = PlayerPrefs.GetInt("PlayerMaxHP", 100);
         playerUnit.currentHP = PlayerPrefs.GetInt("PlayerCurrentHP", 100);
+
+        // Load the current enemy index
+        currentEnemyIndex = PlayerPrefs.GetInt("CurrentEnemyIndex", 0);
 
         SpawnNextEnemy();
 
@@ -221,7 +224,7 @@ public class BattleSystem : MonoBehaviour
 
         if (specialCooldown > 0)
         {
-            dialogueText.text = "Special attack on cooldown. " + specialCooldown + " turns left.";
+            dialogueText.text = "Special attack on cooldown. Wait " + specialCooldown + " turns.";
             return;
         }
 
@@ -231,5 +234,13 @@ public class BattleSystem : MonoBehaviour
     void LoadNextScene()
     {
         SceneManager.LoadScene("TopDownScene");
+    }
+
+    void Update()
+    {
+        if (specialCooldown > 0)
+        {
+            specialCooldown--;
+        }
     }
 }
