@@ -22,6 +22,26 @@ public class Unit : MonoBehaviour
             return false;
     }
 
+    public void ApplyDeathPenalty()
+    {
+        // Lose 15 levels but never drop below Level 1
+        unitLevel -= 15;
+        if (unitLevel < 1)
+            unitLevel = 1;
+
+        // Reduce stats but keep above 1 minimum
+        maxHP -= 15;
+        if (maxHP < 1)
+            maxHP = 1;
+
+        damage -= 15;
+        if (damage < 1)
+            damage = 1;
+
+        // Restore HP to max after penalty
+        currentHP = maxHP;
+    }
+
     public void Heal(int amount)
     {
         currentHP += amount;

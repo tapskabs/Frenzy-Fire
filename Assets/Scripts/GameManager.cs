@@ -48,13 +48,18 @@ public class GameManager : MonoBehaviour
     // Call on player death
     public void ApplyDeathPenalty()
     {
-        playerLevel = Mathf.Max(1, playerLevel - loseLevelsOnDeath);
-        maxHP = Mathf.Max(1, maxHP - loseHPOnDeath);
-        damage = Mathf.Max(1, damage - loseDamageOnDeath);
+        playerLevel -= 15;
+        if (playerLevel < 1) playerLevel = 1;
 
-        // Fully restore current HP to new max so player can continue
-        currentHP = maxHP;
+        maxHP -= 15;
+        if (maxHP < 1) maxHP = 1;
+
+        damage -= 15;
+        if (damage < 1) damage = 1;
+
+        currentHP = maxHP; // restore HP after penalty
     }
+
 
     // Called after any change where we might need to display the upgrade UI
     // Returns true if an upgrade panel should be shown (level crossed next multiple of upgradeLevelInterval)
@@ -81,4 +86,5 @@ public class GameManager : MonoBehaviour
     {
         damage += amount;
     }
+
 }
