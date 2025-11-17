@@ -302,14 +302,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerLevel: 1
-  damage: 10
+  damage: 5
   maxHP: 100
   currentHP: 100
   levelsPerVictory: 10
   loseLevelsOnDeath: 15
   loseHPOnDeath: 15
   loseDamageOnDeath: 15
-  upgradeLevelInterval: 10
+  upgradeLevelInterval: 3
   lastUpgradeLevelTriggered: 0
 --- !u!4 &27928047
 Transform:
@@ -1507,7 +1507,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1714929643}
         m_TargetAssemblyTypeName: BattleSystem, Assembly-CSharp
-        m_MethodName: OnSpecialAbilityButton
+        m_MethodName: OnSpecialButton
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -3140,7 +3140,6 @@ MonoBehaviour:
   playerHUD: {fileID: 1727677075}
   enemyHUD: {fileID: 1290496122}
   upgradePanel: {fileID: 27928048}
-  state: 0
 --- !u!4 &1714929644
 Transform:
   m_ObjectHideFlags: 0

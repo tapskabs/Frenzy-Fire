@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public enum BattleState { START, PLAYERTURN, ENEMYTURN, WON, LOST }
 
@@ -8,7 +9,7 @@ public class BattleSystem : MonoBehaviour
 {
     [Header("Prefabs / Transforms")]
     public GameObject playerPrefab;
-    public GameObject[] enemyPrefabs; // last one should be boss prefab
+    public GameObject[] enemyPrefabs; // last one = boss prefab
     public Transform playerBattleStation;
     public Transform enemyBattleStation;
 
@@ -16,19 +17,21 @@ public class BattleSystem : MonoBehaviour
     public Text dialogueText;
     public BattleHUD playerHUD;
     public BattleHUD enemyHUD;
-    public UpgradePanel upgradePanel; // drag your UpgradePanel here
+    public UpgradePanel upgradePanel;
 
-    Unit playerUnit;
-    Unit enemyUnit;
+    private Unit playerUnit;
+    private Unit enemyUnit;
+    private GameObject currentEnemyGO;
 
-    public BattleState state;
+    private BattleState state;
 
-    // special attack cooldown trackers
-    private int turnsSinceSpecial = 3; // start able to use
+    // cooldown
+    private int turnsSinceSpecial = 3;
     private const int requiredTurnsBetweenSpecial = 3;
 
-    // single enemy per fight
-    private GameObject currentEnemyGO;
+    // ⭐ NEW — Track boss fight
+    private bool isBossFight = false;
+
 
     void Start()
     {
@@ -38,28 +41,37 @@ public class BattleSystem : MonoBehaviour
 
     IEnumerator SetupBattle()
     {
-        // If first time, instantiate player into station
+        // first-time player spawn
         if (playerUnit == null)
         {
             GameObject playerGO = Instantiate(playerPrefab, playerBattleStation);
             playerUnit = playerGO.GetComponent<Unit>();
         }
 
-        // Load player stats from GameManager singleton
+        // load player stats from GameManager
         var gm = GameManager.Instance;
         playerUnit.unitLevel = gm.playerLevel;
         playerUnit.damage = gm.damage;
         playerUnit.maxHP = gm.maxHP;
         playerUnit.currentHP = gm.currentHP;
 
-        // spawn a single enemy for this fight
+        // enemy spawn
         SpawnSingleEnemy();
 
-        dialogueText.text = "A wild " + enemyUnit.unitName + " approaches...";
+        // normal message OR boss incoming warning
+        if (isBossFight)
+        {
+            dialogueText.text = " BOSS INCOMING! Prepare yourself!"; // ⭐ NEW
+        }
+        else
+        {
+            dialogueText.text = "A wild " + enemyUnit.unitName + " approaches...";
+        }
+
         playerHUD.SetHUD(playerUnit);
         enemyHUD.SetHUD(enemyUnit);
 
-        yield return new WaitForSeconds(1.2f);
+        yield return new WaitForSeconds(1.5f);
 
         state = BattleState.PLAYERTURN;
         PlayerTurn();
@@ -67,29 +79,30 @@ public class BattleSystem : MonoBehaviour
 
     void SpawnSingleEnemy()
     {
-        // Clear existing enemy if present
         if (currentEnemyGO != null) Destroy(currentEnemyGO);
 
-        // Determine whether to spawn boss: only spawn boss if player level > 50
-        bool spawnBoss = GameManager.Instance.playerLevel > 50;
+        // ⭐ NEW — Boss only spawns when > level 50
+        bool spawnBoss = GameManager.Instance.playerLevel >= 50;
 
         GameObject prefabToSpawn;
-        if (spawnBoss && enemyPrefabs.Length > 0)
+
+        if (spawnBoss)
         {
-            prefabToSpawn = enemyPrefabs[enemyPrefabs.Length - 1]; // last = boss
+            prefabToSpawn = enemyPrefabs[enemyPrefabs.Length - 1];
+            isBossFight = true; // ⭐ NEW
         }
         else
         {
-            // choose a random normal enemy from array excluding last element (boss)
             int maxIndex = Mathf.Max(0, enemyPrefabs.Length - 1);
             int idx = (maxIndex == 0) ? 0 : Random.Range(0, maxIndex);
             prefabToSpawn = enemyPrefabs[idx];
+            isBossFight = false;
         }
 
         currentEnemyGO = Instantiate(prefabToSpawn, enemyBattleStation);
         enemyUnit = currentEnemyGO.GetComponent<Unit>();
 
-        // Basic scaling so enemies are somewhat tied to player level
+        // scale enemy stats to player
         int scaleLevel = Mathf.Max(1, GameManager.Instance.playerLevel + Random.Range(-2, 3));
         enemyUnit.unitLevel = scaleLevel;
         enemyUnit.maxHP = Mathf.Max(1, enemyUnit.maxHP + scaleLevel * 4);
@@ -99,15 +112,17 @@ public class BattleSystem : MonoBehaviour
         enemyHUD.SetHUD(enemyUnit);
     }
 
+    // ——————————————————————————————————————————
+    // PLAYER ATTACK
+    // ——————————————————————————————————————————
     IEnumerator PlayerAttack()
     {
         bool isDead = enemyUnit.TakeDamage(playerUnit.damage);
         enemyHUD.SetHP(enemyUnit.currentHP);
-        dialogueText.text = "You hit for " + playerUnit.damage + " damage.";
 
+        dialogueText.text = "You hit for " + playerUnit.damage + " damage.";
         yield return new WaitForSeconds(1.2f);
 
-        // increment turn counter for special cooldown (player action counts)
         turnsSinceSpecial++;
 
         if (isDead)
@@ -122,22 +137,23 @@ public class BattleSystem : MonoBehaviour
         }
     }
 
+    // ——————————————————————————————————————————
+    // SPECIAL ATTACK
+    // ——————————————————————————————————————————
     IEnumerator PlayerSpecial()
     {
-        // Check cooldown
         if (turnsSinceSpecial < requiredTurnsBetweenSpecial)
         {
             dialogueText.text = $"Special on cooldown. Wait {requiredTurnsBetweenSpecial - turnsSinceSpecial} turn(s).";
             yield break;
         }
 
-        // Execute special: double damage attack for this action (doesn't permanently alter base damage)
         int specialDamage = playerUnit.damage * 2;
         bool isDead = enemyUnit.TakeDamage(specialDamage);
-        enemyHUD.SetHP(enemyUnit.currentHP);
-        dialogueText.text = "You used SPECIAL for " + specialDamage + " damage!";
 
-        // reset counter
+        enemyHUD.SetHP(enemyUnit.currentHP);
+        dialogueText.text = "SPECIAL ATTACK! You dealt " + specialDamage + "!";
+
         turnsSinceSpecial = 0;
 
         yield return new WaitForSeconds(1.2f);
@@ -154,6 +170,9 @@ public class BattleSystem : MonoBehaviour
         }
     }
 
+    // ——————————————————————————————————————————
+    // PLAYER HEAL
+    // ——————————————————————————————————————————
     IEnumerator PlayerHeal()
     {
         playerUnit.Heal(5);
@@ -162,57 +181,58 @@ public class BattleSystem : MonoBehaviour
 
         yield return new WaitForSeconds(1.2f);
 
-        // player used one turn
         turnsSinceSpecial++;
 
         state = BattleState.ENEMYTURN;
         StartCoroutine(EnemyTurn());
     }
 
+    // ——————————————————————————————————————————
+    // ENEMY TURN
+    // ——————————————————————————————————————————
     IEnumerator EnemyTurn()
     {
-        // Randomly decide: heal by 8 or attack
         bool willHeal = Random.Range(0, 2) == 0;
+
         if (willHeal)
         {
             enemyUnit.Heal(8);
             enemyHUD.SetHP(enemyUnit.currentHP);
-            dialogueText.text = $"{enemyUnit.unitName} healed 8 HP!";
+            dialogueText.text = enemyUnit.unitName + " healed 8 HP!";
             yield return new WaitForSeconds(1.0f);
 
-            // enemy used a turn -> increment player's turnsSinceSpecial because turns are counted globally
             turnsSinceSpecial++;
             state = BattleState.PLAYERTURN;
             PlayerTurn();
             yield break;
         }
+
+        dialogueText.text = enemyUnit.unitName + " attacks!";
+        yield return new WaitForSeconds(1.0f);
+
+        bool isDead = playerUnit.TakeDamage(enemyUnit.damage);
+        playerHUD.SetHP(playerUnit.currentHP);
+
+        dialogueText.text = enemyUnit.unitName + " hit you for " + enemyUnit.damage + "!";
+        yield return new WaitForSeconds(1.0f);
+
+        turnsSinceSpecial++;
+
+        if (isDead)
+        {
+            state = BattleState.LOST;
+            OnPlayerDefeated();
+        }
         else
         {
-            dialogueText.text = $"{enemyUnit.unitName} attacks!";
-            yield return new WaitForSeconds(1.0f);
-
-            bool isDead = playerUnit.TakeDamage(enemyUnit.damage);
-            playerHUD.SetHP(playerUnit.currentHP);
-            dialogueText.text = $"{enemyUnit.unitName} hit you for {enemyUnit.damage} damage.";
-
-            yield return new WaitForSeconds(1.0f);
-
-            // enemy used a turn
-            turnsSinceSpecial++;
-
-            if (isDead)
-            {
-                state = BattleState.LOST;
-                OnPlayerDefeated();
-            }
-            else
-            {
-                state = BattleState.PLAYERTURN;
-                PlayerTurn();
-            }
+            state = BattleState.PLAYERTURN;
+            PlayerTurn();
         }
     }
 
+    // ——————————————————————————————————————————
+    // PLAYER TURN MESSAGE
+    // ——————————————————————————————————————————
     void PlayerTurn()
     {
         dialogueText.text = "Choose an action:";
@@ -220,48 +240,45 @@ public class BattleSystem : MonoBehaviour
         enemyHUD.SetHUD(enemyUnit);
     }
 
+    // ——————————————————————————————————————————
+    // VICTORY HANDLING
+    // ——————————————————————————————————————————
     void OnVictory()
     {
         dialogueText.text = "Enemy defeated!";
-        // Apply victory in GameManager: +levels and stat increases
-        GameManager.Instance.ApplyVictory(); // default +levelsPerVictory (5) and +5 damage/maxHP per design
 
-        // Update local playerUnit to match GameManager persist values
+        // apply victory rewards
+        GameManager.Instance.ApplyVictory();
+
+        // update player data
         playerUnit.unitLevel = GameManager.Instance.playerLevel;
         playerUnit.damage = GameManager.Instance.damage;
         playerUnit.maxHP = GameManager.Instance.maxHP;
-        // currentHP remains as-is (do not modify)
 
         playerHUD.SetHUD(playerUnit);
 
-        // If this enemy was boss (if prefab had Enemy.isBoss or last prefab), treat as final win
-        Enemy enemyScript = currentEnemyGO.GetComponent<Enemy>();
-        bool defeatedBoss = enemyScript != null && enemyScript.isBoss;
-
-        // Destroy enemy object
-        Destroy(currentEnemyGO);
-
-        // check upgrade trigger
-        if (GameManager.Instance.ShouldTriggerUpgrade())
+        // ⭐ NEW — Boss defeated? End game immediately
+        if (isBossFight)
         {
-            // show upgrade panel (pauses flow until a button pressed)
-            if (upgradePanel != null)
-            {
-                upgradePanel.Show();
-            }
-        }
-
-        if (defeatedBoss)
-        {
-            // Final win. You can show any win UI. For now just show text and stop.
-            dialogueText.text = "You defeated the BOSS! You win!";
-            // Optionally: freeze the battle system or show victory UI
-            state = BattleState.WON;
+            dialogueText.text = " You defeated the BOSS! Victory!";
+            StartCoroutine(LoadEndScreen());
             return;
         }
 
-        // Spawn next enemy after small delay
+        // level-up upgrade panel
+        if (GameManager.Instance.ShouldTriggerUpgrade())
+        {
+            upgradePanel?.Show();
+        }
+
+        Destroy(currentEnemyGO);
         StartCoroutine(SpawnNextAfterDelay(1.2f));
+    }
+
+    IEnumerator LoadEndScreen() // ⭐ NEW
+    {
+        yield return new WaitForSeconds(3f);
+        SceneManager.LoadScene("EndScreen");
     }
 
     IEnumerator SpawnNextAfterDelay(float delay)
@@ -271,22 +288,22 @@ public class BattleSystem : MonoBehaviour
         StartCoroutine(SetupBattle());
     }
 
+    // ——————————————————————————————————————————
+    // DEFEAT HANDLING
+    // ——————————————————————————————————————————
     void OnPlayerDefeated()
     {
         dialogueText.text = "You were defeated...";
-        // Apply death penalties from GameManager
+
         GameManager.Instance.ApplyDeathPenalty();
 
-        // Sync to local playerUnit
         playerUnit.unitLevel = GameManager.Instance.playerLevel;
         playerUnit.damage = GameManager.Instance.damage;
         playerUnit.maxHP = GameManager.Instance.maxHP;
         playerUnit.currentHP = GameManager.Instance.currentHP;
 
-        // Update HUD
         playerHUD.SetHUD(playerUnit);
 
-        // After short delay, respawn next enemy (do not reset run)
         StartCoroutine(RespawnAfterDeath(1.5f));
     }
 
@@ -294,7 +311,6 @@ public class BattleSystem : MonoBehaviour
     {
         yield return new WaitForSeconds(delay);
 
-        // Destroy previous enemy and spawn next
         if (currentEnemyGO != null)
             Destroy(currentEnemyGO);
 
@@ -302,7 +318,9 @@ public class BattleSystem : MonoBehaviour
         StartCoroutine(SetupBattle());
     }
 
-    // UI button hooks
+    // ——————————————————————————————————————————
+    // BUTTON HOOKS
+    // ——————————————————————————————————————————
     public void OnAttackButton()
     {
         if (state != BattleState.PLAYERTURN) return;
