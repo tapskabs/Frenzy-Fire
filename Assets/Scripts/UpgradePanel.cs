@@ -39,6 +39,7 @@ public class UpgradePanel : MonoBehaviour
     public void OnChooseHealth()
     {
         GameManager.Instance.ApplyUpgrade_Health(healthAmount);
+        GameManager.Instance.ApplyUpgrade_Heal(12); // << ADD THIS
         Hide();
     }
 

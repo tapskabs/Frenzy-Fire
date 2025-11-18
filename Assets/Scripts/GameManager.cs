@@ -9,6 +9,8 @@ public class GameManager : MonoBehaviour
     public int damage = 10;
     public int maxHP = 100;
     public int currentHP = 100;
+   
+    public int healAmount = 5; // base
 
     [Header("Run settings")]
     public int levelsPerVictory = 5;      // how many levels you gain per defeated enemy
@@ -80,6 +82,10 @@ public class GameManager : MonoBehaviour
         maxHP += amount;
         // do NOT heal currentHP unless you want to
         currentHP = Mathf.Min(currentHP, maxHP);
+    }
+    public void ApplyUpgrade_Heal(int amount)
+    {
+        healAmount += amount;
     }
 
     public void ApplyUpgrade_Damage(int amount)

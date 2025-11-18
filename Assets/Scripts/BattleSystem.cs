@@ -175,17 +175,27 @@ public class BattleSystem : MonoBehaviour
     // ——————————————————————————————————————————
     IEnumerator PlayerHeal()
     {
-        playerUnit.Heal(5);
+        // Use upgraded heal value from GameManager
+        int heal = GameManager.Instance.healAmount;
+        playerUnit.Heal(heal);
+
+        // Update HUD
         playerHUD.SetHP(playerUnit.currentHP);
-        dialogueText.text = "You healed 5 HP.";
+        dialogueText.text = $"You healed {heal} HP!";
+
+        // Make heal persistent
+        GameManager.Instance.currentHP = playerUnit.currentHP;
 
         yield return new WaitForSeconds(1.2f);
 
+        // Count this as a turn for special cooldown
         turnsSinceSpecial++;
 
         state = BattleState.ENEMYTURN;
         StartCoroutine(EnemyTurn());
     }
+
+
 
     // ——————————————————————————————————————————
     // ENEMY TURN

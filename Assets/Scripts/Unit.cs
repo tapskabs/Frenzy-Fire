@@ -41,12 +41,13 @@ public class Unit : MonoBehaviour
         // Restore HP to max after penalty
         currentHP = maxHP;
     }
-
+  
     public void Heal(int amount)
     {
         currentHP += amount;
         if (currentHP > maxHP)
             currentHP = maxHP;
+
     }
 
     public void LevelUp()

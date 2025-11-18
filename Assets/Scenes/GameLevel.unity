@@ -305,11 +305,12 @@ MonoBehaviour:
   damage: 5
   maxHP: 100
   currentHP: 100
+  healAmount: 5
   levelsPerVictory: 10
   loseLevelsOnDeath: 15
   loseHPOnDeath: 15
   loseDamageOnDeath: 15
-  upgradeLevelInterval: 3
+  upgradeLevelInterval: 5
   lastUpgradeLevelTriggered: 0
 --- !u!4 &27928047
 Transform:
@@ -340,10 +341,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   panelRoot: {fileID: 1112591611}
   titleText: {fileID: 1604837867}
-  optionAtext: {fileID: 1327642502}
-  optionBtext: {fileID: 1010117117}
-  healthAmount: 10
-  damageAmount: 5
+  optionAtext: {fileID: 1010117117}
+  optionBtext: {fileID: 1327642502}
+  healthAmount: 12
+  damageAmount: 7
 --- !u!1 &102492889
 GameObject:
   m_ObjectHideFlags: 0
